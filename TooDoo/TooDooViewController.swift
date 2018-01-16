@@ -10,11 +10,15 @@ import UIKit
 
 class TooDooViewController: UITableViewController {
     
-    var itemArray = ["Buy milk", "Figth a Robot", "Swipe to delete"]
+    var itemArray : [String] = []
+    let userDefault = UserDefaults.standard
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        if let items = userDefault.array(forKey: "TooDooArray") as? [String]{
+            itemArray = items
+        }
     }
     
     //MARK - TableView Datasource Methodes
@@ -73,6 +77,7 @@ class TooDooViewController: UITableViewController {
     func addToArray(_ text: String){
         if text != ""{
             itemArray.append(text)
+            userDefault.set(itemArray, forKey: "TooDooArray")
             tableView.reloadData()
         }
     }
