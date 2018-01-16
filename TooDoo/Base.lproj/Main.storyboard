@@ -34,7 +34,14 @@
                             <outlet property="delegate" destination="Gcy-6J-Nma" id="igq-dQ-hYf"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="TooDoo" id="HEQ-Pd-ojx"/>
+                    <navigationItem key="navigationItem" title="TooDoo" id="HEQ-Pd-ojx">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Guw-ar-7jL">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addButtonPressed:" destination="Gcy-6J-Nma" id="zmP-aH-Mr8"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="c5S-RH-zlW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -49,6 +56,9 @@
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="barTintColor" red="0.11851615646258504" green="0.5974731747027211" blue="0.8118640184" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <textAttributes key="titleTextAttributes">
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </textAttributes>
                         <textAttributes key="largeTitleTextAttributes">
                             <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         </textAttributes>
