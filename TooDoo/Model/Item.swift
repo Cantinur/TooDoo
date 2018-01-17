@@ -8,7 +8,8 @@
 
 import Foundation
 
-class Item{
+class Item: Codable{
+    
     private var _itemName:String
     private var _isChecked:Bool = false
     

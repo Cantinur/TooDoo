@@ -10,14 +10,14 @@ import UIKit
 
 class TooDooViewController: UITableViewController {
     
-    var itemArray : [Item] = [Item("Buy Milk")]
+    var itemArray : [Item] = []
+    
+    //Gir filstien til appen.
+    let dataFilPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if let items = UserDefaults.standard.array(forKey: "TooDooList") as? [Item]{
-            itemArray = items
-        }
+        loadItems()
     }
     
     //MARK - TableView Datasource Methodes
@@ -41,8 +41,8 @@ class TooDooViewController: UITableViewController {
     //MARK - TableView Deligate Method
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         itemArray[indexPath.row].changeCheck()
+        svareToFile()
         
-        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -78,9 +78,30 @@ class TooDooViewController: UITableViewController {
     func addToArray(_ text: String){
         if text != ""{
             itemArray.append(Item(text))
-            UserDefaults.standard.set(itemArray, forKey: "TooDooList")
-            tableView.reloadData()
-            UserDefaults.standard.synchronize()
+            svareToFile()
+        }
+    }
+    
+    //MARK - From File methodes
+    func svareToFile(){
+        let encoder = PropertyListEncoder()
+        do{
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilPath!)
+        } catch {
+            print("Error ecoding item array: \(error)")
+        }
+        tableView.reloadData()
+    }
+    
+    func loadItems(){
+        if let data = try? Data(contentsOf: dataFilPath!){
+            let decoder = PropertyListDecoder()
+            do{
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding items array: \(error)")
+            }
         }
     }
     
