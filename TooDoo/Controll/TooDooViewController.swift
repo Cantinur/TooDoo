@@ -10,13 +10,12 @@ import UIKit
 
 class TooDooViewController: UITableViewController {
     
-    var itemArray : [String] = []
-    let userDefault = UserDefaults.standard
-
+    var itemArray : [Item] = [Item("Buy Milk")]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let items = userDefault.array(forKey: "TooDooArray") as? [String]{
+        if let items = UserDefaults.standard.array(forKey: "TooDooList") as? [Item]{
             itemArray = items
         }
     }
@@ -29,19 +28,21 @@ class TooDooViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell") as UITableViewCell!
+        let item = itemArray[indexPath.row]
         
-        cell.textLabel?.text = itemArray[indexPath.row]
+        cell.textLabel?.text = item.item
+        
+        cell.accessoryType = item.check ? .checkmark : .none
         
         return cell
     }
     
+    
     //MARK - TableView Deligate Method
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        itemArray[indexPath.row].changeCheck()
         
-        tableView.cellForRow(at: indexPath)?.accessoryType =
-            tableView.cellForRow(at: indexPath)?.accessoryType  == .checkmark
-            ? .none : .checkmark
-        
+        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -55,7 +56,7 @@ class TooDooViewController: UITableViewController {
             alertTextFeeld.placeholder = "Creat new item"
             textField = alertTextFeeld
         }
-
+        
         //Cancel Button
         alert.addAction(UIAlertAction(title: "Cancel", style: .default) { (cancel) in
             alert.dismiss(animated: true, completion: nil)
@@ -76,11 +77,13 @@ class TooDooViewController: UITableViewController {
     
     func addToArray(_ text: String){
         if text != ""{
-            itemArray.append(text)
-            userDefault.set(itemArray, forKey: "TooDooArray")
+            itemArray.append(Item(text))
+            UserDefaults.standard.set(itemArray, forKey: "TooDooList")
             tableView.reloadData()
+            UserDefaults.standard.synchronize()
         }
     }
     
 }
+
 
