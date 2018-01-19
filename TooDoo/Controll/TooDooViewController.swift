@@ -12,6 +12,13 @@ import CoreData
 class TooDooViewController: UITableViewController {
     
     var itemArray = [Item]()
+    
+    var selectedCategory : Category? {
+        didSet{
+            loadItems()
+        }
+    }
+    
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     //Gir filstien til appen.
@@ -19,8 +26,6 @@ class TooDooViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        
-        loadItems()
     }
     
     //MARK: - TableView Datasource Methodes
@@ -87,6 +92,7 @@ class TooDooViewController: UITableViewController {
             let newItem = Item(context: context)
             newItem.title = text
             newItem.checked = false
+            newItem.parentCategory = selectedCategory
             itemArray.append(newItem)
             saveToFile()
         }
@@ -102,7 +108,19 @@ class TooDooViewController: UITableViewController {
         tableView.reloadData()
     }
     
-    func loadItems(_ request: NSFetchRequest<Item> = Item.fetchRequest()){
+    func loadItems(_ request: NSFetchRequest<Item> = Item.fetchRequest(), withPredicate: NSPredicate? = nil){
+        
+        let predicate = NSPredicate(format: "parentCategory.name MATCHES %@", (selectedCategory?.name!)!)
+        
+        if let otherPredicate = withPredicate{
+            let compundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, otherPredicate])
+            request.predicate = compundPredicate
+            
+        } else {
+            request.predicate = predicate
+        }
+        
+        
         do{
             itemArray = try context.fetch(request)
             tableView.reloadData()
@@ -123,9 +141,9 @@ extension TooDooViewController: UISearchBarDelegate{
         
         if let search = searchBar.text {
             if search != ""{
-                request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", search)
+                let predicate = NSPredicate(format: "title CONTAINS[cd] %@", search)
                 request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-                loadItems(request)
+                loadItems(request, withPredicate: predicate)
             }
         }
     }

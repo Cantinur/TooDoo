@@ -21,16 +21,19 @@ class CategoryViewController: UITableViewController {
     }
     
     //MARK: Load & Save
-    func saveToFile(){
+    func saveToCategories(){
         do{
             try context.save()
         } catch {
             print("Error saving item: \(error)")
         }
-        tableView.reloadData()
+        loadCategorys()
     }
     
-    func loadCategorys(_ request: NSFetchRequest<Category> = Category.fetchRequest()){
+    func loadCategorys(){
+        
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        
         do{
             categoryCatalog = try context.fetch(request)
             tableView.reloadData()
@@ -45,7 +48,7 @@ class CategoryViewController: UITableViewController {
         var textField = UITextField()
         
         alert.addTextField { (alertTextFeeld) in
-            alertTextFeeld.placeholder = "Creat new item"
+            alertTextFeeld.placeholder = "Add a name"
             textField = alertTextFeeld
         }
         
@@ -53,7 +56,7 @@ class CategoryViewController: UITableViewController {
             alert.dismiss(animated: true, completion: nil)
         }))
         
-        alert.addAction(UIAlertAction(title: "Add List", style: .default, handler: { (addBtn) in
+        alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { (addBtn) in
             self.addCatalog(textField.text!)
         }))
         
@@ -66,8 +69,7 @@ class CategoryViewController: UITableViewController {
             let newCategory = Category(context: context)
             newCategory.name = text
             categoryCatalog.append(newCategory)
-            saveToFile()
-            
+            saveToCategories()
         }
     }
 
@@ -79,7 +81,6 @@ class CategoryViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.tableView.dequeueReusableCell(withIdentifier: "CategoryCell") as UITableViewCell!
         cell?.textLabel?.text = categoryCatalog[indexPath.row].name!
-        
         return cell!
     }
     
@@ -87,8 +88,16 @@ class CategoryViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Valgte celle \(categoryCatalog[indexPath.row].name!)")
         
-        
+        performSegue(withIdentifier: "goToItems", sender: self)
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destination = segue.destination as! TooDooViewController
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destination.selectedCategory = categoryCatalog[indexPath.row]
+        }
     }
     
     //MARK: Data Manipulation Methodes
